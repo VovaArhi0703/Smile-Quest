@@ -47,6 +47,10 @@ jobs:
           python-version: '3.11'
           cache: pip
           cache-dependency-path: exercise_server/requirements*.txt
+      - name: Install MediaPipe system libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libegl1 libgles2 libgl1 libglib2.0-0t64 libgomp1
       - run: python -m pip install -r requirements-dev.txt
       - name: Download the public test model
         run: >-
