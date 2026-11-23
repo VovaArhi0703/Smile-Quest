@@ -1,0 +1,7 @@
+{$API_DOMAIN} {
+    reverse_proxy api:8100
+}
+
+{$EXERCISE_DOMAIN} {
+    reverse_proxy {$EXERCISE_PRIVATE_IP}:8000
+}

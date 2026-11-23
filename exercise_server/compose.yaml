@@ -1,0 +1,12 @@
+services:
+  exercises:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      FACE_LANDMARKER_MODEL: /models/face_landmarker.task
+      ALLOW_ANONYMOUS_EXERCISES: ${ALLOW_ANONYMOUS_EXERCISES:-false}
+      EXERCISE_AUTH_URL: ${EXERCISE_AUTH_URL:-}
+    volumes:
+      - ./models:/models:ro

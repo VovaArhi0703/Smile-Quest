@@ -1,0 +1,79 @@
+name: smile-quest-data
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: smilequest
+      POSTGRES_USER: smilequest
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set a strong POSTGRES_PASSWORD}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ../backend/schema.sql:/docker-entrypoint-initdb.d/001-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smilequest -d smilequest"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks:
+      - data
+
+  api:
+    build:
+      context: ../backend
+    restart: unless-stopped
+    command:
+      - uvicorn
+      - app.main:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8100"
+      - --proxy-headers
+      - --forwarded-allow-ips=*
+    environment:
+      DATABASE_URL: postgresql://smilequest:${POSTGRES_PASSWORD:?Set a strong POSTGRES_PASSWORD}@db:5432/smilequest
+      PHOTO_ROOT: /data/photos
+      PHOTO_SIGNING_KEY: ${PHOTO_SIGNING_KEY:?Set a random PHOTO_SIGNING_KEY}
+      APP_ENV: production
+    volumes:
+      - photo_data:/data/photos
+    ports:
+      - "${DATA_PRIVATE_IP:?Set DATA_PRIVATE_IP}:8100:8100"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - data
+      - edge
+
+  caddy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    environment:
+      API_DOMAIN: ${API_DOMAIN:?Set API_DOMAIN}
+      EXERCISE_DOMAIN: ${EXERCISE_DOMAIN:?Set EXERCISE_DOMAIN}
+      EXERCISE_PRIVATE_IP: ${EXERCISE_PRIVATE_IP:?Set EXERCISE_PRIVATE_IP}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+    networks:
+      - edge
+
+networks:
+  data:
+    internal: true
+  edge:
+
+volumes:
+  pg_data:
+  photo_data:
+  caddy_data:
+  caddy_config:

@@ -1,0 +1,99 @@
+# Operating systems and editors
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.iml
+*.ipr
+*.iws
+.idea/
+.history/
+.svn/
+.atom/
+.vscode/*.local.json
+
+# Flutter and Dart (keep pubspec.lock)
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+build/
+coverage/
+**/doc/api/
+app.*.symbols
+app.*.map.json
+
+# Android output and local configuration
+.gradle/
+.kotlin/
+.cxx/
+*.class
+/android/local.properties
+/android/key.properties
+/android/app/debug/
+/android/app/profile/
+/android/app/release/
+
+# Apple output (see also ios/.gitignore)
+DerivedData/
+Pods/
+.symlinks/
+.swiftpm/
+**/ios/Flutter/.last_build_id
+
+# Python environments, caches and packaging
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+
+# Secrets; keep only example environment files
+.env
+.env.*
+*.env
+!.env.example
+!*.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+id_rsa*
+id_ed25519*
+
+# Runtime data, database backups, downloaded models and logs
+*.db
+*.sqlite
+*.sqlite3
+*.sqlite3-*
+*.dump
+*.backup
+*.bak
+*.log
+*.task
+/photos/
+/backend/photos/
+/backend/pg_data/
+/backend/photo_data/
+/deploy/pg_data/
+/deploy/photo_data/
+/backups/
+
+# Local working materials and generated reports
+/tmp/
+/reports/
+/css figma/
+/тесты упражнений/
+*.apk
+*.aab
+*.ipa

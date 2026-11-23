@@ -1,0 +1,32 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: biosmile
+      POSTGRES_USER: biosmile
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local_dev_only_change_me}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/001-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U biosmile -d biosmile"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  api:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://biosmile:${POSTGRES_PASSWORD:-local_dev_only_change_me}@db:5432/biosmile
+      PHOTO_ROOT: /data/photos
+      PHOTO_SIGNING_KEY: ${PHOTO_SIGNING_KEY:-local_dev_only_replace_before_deploy}
+      APP_ENV: local
+    volumes:
+      - photo_data:/data/photos
+    ports:
+      - "127.0.0.1:8100:8100"
+    depends_on:
+      db:
+        condition: service_healthy
+volumes:
+  pg_data:
+  photo_data:

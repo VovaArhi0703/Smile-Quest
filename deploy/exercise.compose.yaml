@@ -1,0 +1,15 @@
+name: smile-quest-exercise
+
+services:
+  exercises:
+    build:
+      context: ../exercise_server
+    restart: unless-stopped
+    environment:
+      FACE_LANDMARKER_MODEL: /models/face_landmarker.task
+      ALLOW_ANONYMOUS_EXERCISES: "false"
+      EXERCISE_AUTH_URL: http://${DATA_PRIVATE_IP:?Set DATA_PRIVATE_IP}:8100
+    volumes:
+      - ../exercise_server/models:/models:ro
+    ports:
+      - "${EXERCISE_PRIVATE_IP:?Set EXERCISE_PRIVATE_IP}:8000:8000"

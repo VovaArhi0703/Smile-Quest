@@ -1,0 +1,26 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Flutter: get dependencies",
+            "type": "shell",
+            "command": "flutter",
+            "args": ["pub", "get"],
+            "problemMatcher": []
+        },
+        {
+            "label": "Flutter: analyze",
+            "type": "shell",
+            "command": "flutter",
+            "args": ["analyze"],
+            "problemMatcher": ["$dart-analyze"]
+        },
+        {
+            "label": "Flutter: run",
+            "type": "shell",
+            "command": "flutter",
+            "args": ["run"],
+            "problemMatcher": []
+        }
+    ]
+}

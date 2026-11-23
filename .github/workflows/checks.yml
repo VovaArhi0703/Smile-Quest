@@ -1,0 +1,87 @@
+name: Checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  flutter:
+    name: Flutter analysis and tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.9'
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      # Keep existing informational lints visible; errors/warnings still fail.
+      - run: flutter analyze --no-fatal-infos
+      - run: flutter test
+
+  exercises:
+    name: Exercise geometry and WebSocket protocol
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: exercise_server
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: exercise_server/requirements*.txt
+      - run: python -m pip install -r requirements-dev.txt
+      - name: Download the public test model
+        run: >-
+          python -c "import urllib.request;
+          urllib.request.urlretrieve('https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/latest/face_landmarker.task',
+          'models/face_landmarker.task')"
+      - run: python -m unittest discover -s tests -v
+
+  backend:
+    name: PostgreSQL task sync
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: smile_quest_test
+          POSTGRES_PASSWORD: local_test_only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d smile_quest_test"
+          --health-interval 3s
+          --health-timeout 3s
+          --health-retries 20
+    env:
+      TASKS_TEST_DATABASE_URL: postgresql://postgres:local_test_only@127.0.0.1:5432/smile_quest_test
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: backend/requirements*.txt
+      - run: python -m pip install -r backend/requirements-dev.txt
+      - run: python -m unittest backend.test_tasks -v

@@ -1,0 +1,9 @@
+.env
+*.env
+.venv/
+__pycache__/
+*.pyc
+*.backup
+photos/
+pg_data/
+photo_data/
