@@ -15,7 +15,8 @@ concurrency:
 jobs:
   flutter:
     name: Flutter analysis and tests
-    runs-on: ubuntu-24.04
+    # Screenshot baselines were captured on Windows; keep the same renderer.
+    runs-on: windows-2022
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v6
